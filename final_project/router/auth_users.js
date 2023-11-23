@@ -15,16 +15,33 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const user = req.body;
+    if (!user) {
+        return res.status(404).json({message: "Body Empty"});
+    }
+    let accessToken = jwt.sign({
+        data: user
+      }, 'access', { expiresIn: 60 * 60 });
+      req.session.authorization = {
+        accessToken
+    }
+    return res.status(200).send("User successfully logged in");
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const review = req.query.review;
+  const isbn = req.params.isbn;
+  const stringBooks = JSON.stringify(books);
+    const jsonBooks = JSON.parse(stringBooks);
+    let filtered_book = jsonBooks[isbn];
+    filtered_book.review = review;
+    
+  return res.send(`The review for the book with isbn ${isbn} has been added`);
 });
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
+
+// test 2
